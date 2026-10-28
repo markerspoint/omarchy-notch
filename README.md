@@ -1,5 +1,7 @@
 # Omarchy Notch
 
+[![CI](https://github.com/markerspoint/omarchy-notch/actions/workflows/ci.yml/badge.svg)](https://github.com/markerspoint/omarchy-notch/actions/workflows/ci.yml)
+
 A Mac-style notch for the Omarchy desktop. It attaches beneath the centered
 clock, expands on hover, and uses real frosted glass that follows your wallpaper.
 
@@ -105,6 +107,32 @@ then remove `~/.config/omarchy/plugins/mark.notch/` and restart the shell.
 If installed with `--glass`, remove the marked `require("hypr.notch")` block
 from `looknfeel.lua` and remove `~/.config/hypr/notch.lua`. Reload Hyprland and
 check `hyprctl configerrors`. Backups can be used to restore previous settings.
+
+## CI and releases
+
+GitHub Actions runs on pushes to `main`, pull requests, and manual CI runs:
+
+- Installer, recorder-state, and archive tests on Python 3.11 and 3.14.
+- QML parsing, ShellCheck, Bash syntax, and Lua syntax checks.
+- A reproducible installable archive and `SHA256SUMS`, available as the
+  `omarchy-notch` workflow artifact after all checks pass.
+
+These checks do not replace testing on a running Omarchy desktop.
+
+To publish a release, update `manifest.json` to the intended version, commit
+and push the change, then push a matching tag. For example, when the manifest
+version is `0.1.0`:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The release workflow reruns CI, requires the tag to match the manifest version,
+verifies the tested artifact's checksum, and publishes a GitHub release with
+the archive and checksum. Publishing requires no additional repository secrets.
+
+Build the same archive locally with `python scripts/package.py`.
 
 ## Development
 
