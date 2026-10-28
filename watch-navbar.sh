@@ -18,7 +18,8 @@ while :; do
       -gravity NorthWest -crop "${sample_width}x${bar_height}+${sample_x}+0" +repage \
       -resize '1x1!' -format '%[fx:int(255*r)],%[fx:int(255*g)],%[fx:int(255*b)]' info:- 2>/dev/null || true)
     if [[ "$rgb" =~ ^([0-9]+),([0-9]+),([0-9]+)$ ]]; then
-      printf '#%02x%02x%02x\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}"
+      sample=$(printf '#%02x%02x%02x' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}")
+      python -c 'import json,sys; print(json.dumps({"color": sys.argv[1], "path": sys.argv[2], "revision": sys.argv[3]}))' "$sample" "$wallpaper" "$key"
     fi
   fi
   sleep 2

@@ -14,6 +14,7 @@ clock, expands on hover, and uses real frosted glass that follows your wallpaper
 - **Notifications:** compact cards that resize around their text and support the notification's default action.
 - **Calendar:** month navigation, today, week number, and year progress.
 - **Live video preview:** mirrors a dedicated browser picture-in-picture window into the music pane.
+- **Liquid glass:** wallpaper refraction, curved edge highlights, and a pointer-responsive sheen over compositor blur.
 - **Desktop integration:** the clock still opens the notch; nearby bar buttons remain clickable.
 
 ## Requirements
@@ -108,12 +109,34 @@ If installed with `--glass`, remove the marked `require("hypr.notch")` block
 from `looknfeel.lua` and remove `~/.config/hypr/notch.lua`. Reload Hyprland and
 check `hyprctl configerrors`. Backups can be used to restore previous settings.
 
+## Liquid glass
+
+The expanded notch layers a GPU lens shader over Hyprland's wallpaper blur.
+Refraction is concentrated around the curved perimeter; highlights follow the
+pointer, while media, text, and controls stay sharp. The top edge fades into
+the bar to preserve its seamless join. It samples the current wallpaper, not
+private application windows, and falls back to the existing frosted surface
+when no wallpaper texture is available. This is a custom effect, not Apple's
+Liquid Glass rendering system.
+
+Set `liquidGlassEnabled` to `false` near the top of `Notch.qml` to keep the
+original frosted look. The effect uses the transparent bar mode. The precompiled
+shader is included, so installation does not require development tools.
+Developers can rebuild it with Qt Shader Tools:
+
+```sh
+/usr/lib/qt6/bin/qsb --qt6 --qsbversion 64 -o liquid-glass.frag.qsb liquid-glass.frag
+```
+
+The compatibility output targets Qt 6.4 and newer; compiling requires a recent
+`qsb` supporting `--qsbversion`. CI also compiles the source on Ubuntu's Qt 6.4.
+
 ## CI and releases
 
 GitHub Actions runs on pushes to `main`, pull requests, and manual CI runs:
 
 - Installer, recorder-state, and archive tests on Python 3.11 and 3.14.
-- QML parsing, ShellCheck, Bash syntax, and Lua syntax checks.
+- QML parsing, shader compilation, ShellCheck, Bash syntax, and Lua syntax checks.
 - A reproducible installable archive and `SHA256SUMS`, available as the
   `omarchy-notch` workflow artifact after all checks pass.
 

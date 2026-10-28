@@ -79,6 +79,8 @@ Item {
           anchors.right: parent.right
           anchors.verticalCenter: parent.verticalCenter
           color: Commons.Util.alpha(pane.foreground, buttonMouse.containsMouse ? 0.16 : 0.08)
+          border.width: 1
+          border.color: Commons.Util.alpha(pane.foreground, buttonMouse.containsMouse ? 0.22 : 0.08)
           opacity: modelData.enabled ? 1 : 0.4
           Text {
             id: buttonLabel

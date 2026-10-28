@@ -46,12 +46,14 @@ jobs:
       - name: Install syntax-checking tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends qt6-declarative-dev-tools shellcheck lua5.4
+          sudo apt-get install -y --no-install-recommends qt6-declarative-dev-tools qt6-shader-baker shellcheck lua5.4
       - name: Parse QML
         run: |
           for file in *.qml; do
             /usr/lib/qt6/bin/qmlformat -n "$file" > /dev/null
           done
+      - name: Compile liquid glass shader
+        run: /usr/lib/qt6/bin/qsb --qt6 -o "$RUNNER_TEMP/liquid-glass.frag.qsb" liquid-glass.frag
       - name: Check shell scripts
         run: |
           bash -n watch-navbar.sh

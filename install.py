@@ -12,6 +12,7 @@ PLUGIN_FILES = (
     'manifest.json', 'Notch.qml', 'MediaPane.qml', 'ToastPane.qml',
     'CalendarPane.qml', 'ActivityPane.qml', 'cava.conf',
     'watch-navbar.sh', 'watch-notifications.sh', 'watch-recording.py',
+    'LiquidGlass.qml', 'liquid-glass.frag', 'liquid-glass.frag.qsb',
 )
 
 

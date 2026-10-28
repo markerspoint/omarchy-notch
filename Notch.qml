@@ -25,6 +25,13 @@ Item {
   property var manifest: null
 
   // ---------------------------------------------------------------- tuning
+  readonly property bool liquidGlassEnabled: true
+  property url wallpaperImageSource: ""
+  property string wallpaperRevision: ""
+  property real glassLightX: 0.25
+  property real glassLightY: 0.15
+  Behavior on glassLightX { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
+  Behavior on glassLightY { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
   readonly property int collapsedWidth: 164
   readonly property int collapsedHeight: 10
   readonly property int compactWidth: 420
@@ -107,8 +114,16 @@ Item {
     running: true
     stdout: SplitParser {
       onRead: data => {
-        var value = data.trim()
-        if (/^#[0-9a-fA-F]{6}$/.test(value)) root.wallpaperBarColor = value
+        try {
+          var value = JSON.parse(data)
+          if (/^#[0-9a-fA-F]{6}$/.test(value.color)) root.wallpaperBarColor = value.color
+          if (value.revision !== root.wallpaperRevision) {
+            root.wallpaperRevision = value.revision
+            root.wallpaperImageSource = ""
+            var source = Commons.Util.fileUrl(value.path)
+            Qt.callLater(function() { root.wallpaperImageSource = source })
+          }
+        } catch (e) {}
       }
     }
   }
@@ -627,6 +642,22 @@ Item {
         }
       }
 
+      LiquidGlass {
+        id: liquidGlass
+        anchors.fill: parent
+        visible: root.liquidGlassEnabled && root.transparentBar && root.expanded
+        wallpaperSource: visible ? root.wallpaperImageSource : ""
+        screenWidth: window.width
+        screenHeight: window.height
+        sceneX: pill.x
+        sceneY: pill.y
+        cornerRadius: root.expanded ? 26 : 10
+        lightX: root.glassLightX
+        lightY: root.glassLightY
+        opacity: root.expanded ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 180 } }
+      }
+
       Rectangle {
         id: shell
         anchors.fill: parent
@@ -900,6 +931,8 @@ Item {
                   height: 34
                   radius: 17
                   color: Commons.Util.alpha(root.surfaceForeground, actionMouse.containsMouse ? 0.14 : 0.07)
+                  border.width: 1
+                  border.color: Commons.Util.alpha(root.surfaceForeground, actionMouse.containsMouse ? 0.22 : 0.08)
                   opacity: modelData.action === "player" && (!root.player || !root.player.canRaise) ? 0.4 : 1
                   Text {
                     anchors.centerIn: parent
@@ -963,7 +996,11 @@ Item {
           acceptedButtons: Qt.NoButton
           hoverEnabled: true
           onEntered: { hoverExitTimer.stop(); if (!root.expanded && root.hasActivities && !root.playing) root.activitySelected = true; root.hovered = true }
-          onExited: hoverExitTimer.restart()
+          onExited: { hoverExitTimer.restart(); root.glassLightX = 0.25; root.glassLightY = 0.15 }
+          onPositionChanged: mouse => {
+            root.glassLightX = Math.max(0, Math.min(1, mouse.x / width))
+            root.glassLightY = Math.max(0, Math.min(1, mouse.y / height))
+          }
         }
       }
     }
@@ -1029,6 +1066,8 @@ Item {
         activeActivityCount: root.activeActivityCount,
         surfaceColor: root.surfaceColor.toString(),
         surfaceAlpha: root.surfaceColor.a,
+        liquidGlassReady: liquidGlass.ready,
+        liquidGlassLog: liquidGlass.shaderLog,
         notificationView: root.notificationView,
         videoSource: root.videoSource ? root.videoSource.title : null,
         videoApp: root.videoSource ? root.videoSource.appId : null,
