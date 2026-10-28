@@ -31,9 +31,9 @@ may need adjustments. Dimensions and timing are near the top of `Notch.qml`.
 
 ## Install
 
-Clone this repository, enter its directory, then run:
-
 ```sh
+git clone https://github.com/markerspoint/omarchy-notch.git
+cd omarchy-notch
 python install.py --glass
 hyprctl reload
 hyprctl configerrors
@@ -109,3 +109,7 @@ recording. Installer tests use temporary configuration directories.
 
 Built for [Omarchy](https://omarchy.org/), using [Quickshell](https://quickshell.org/)
 and [Cava](https://github.com/karlstav/cava).
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2026 markerspoint.
