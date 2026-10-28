@@ -35,6 +35,10 @@ class InstallTests(unittest.TestCase):
         self.assertEqual((backup / 'mark.notch/Notch.qml').read_text(), 'old plugin')
         self.assertEqual(json.loads((backup / 'shell.json').read_text()), config)
         self.assertTrue((target / 'ActivityPane.qml').is_file())
+        for name in installer.PLUGIN_FILES:
+            self.assertEqual((target / name).read_bytes(), (ROOT / name).read_bytes())
+        for excluded in ('.git', 'tests', 'install.py', 'hypr'):
+            self.assertFalse((target / excluded).exists(), excluded)
         self.assertNotIn('plugins', backup.parts)
 
     def test_reinstall_does_not_duplicate_plugin_or_glass_import(self):
@@ -54,6 +58,12 @@ class InstallTests(unittest.TestCase):
             installer.install(self.config)
         self.assertEqual(self.shell.read_bytes(), original)
         self.assertFalse((self.config / 'omarchy/plugins').exists())
+
+    def test_marketplace_manifest_and_entrypoint_are_at_root(self):
+        manifest = json.loads((ROOT / 'manifest.json').read_text())
+        self.assertEqual(manifest['id'], installer.PLUGIN_ID)
+        self.assertTrue((ROOT / manifest['entryPoints']['overlay']).is_file())
+        self.assertEqual(list(ROOT.rglob('manifest.json')), [ROOT / 'manifest.json'])
 
     def test_install_without_existing_shell_config(self):
         target, _ = installer.install(self.config)

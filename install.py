@@ -5,14 +5,22 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import shutil
-import sys
 
 PROJECT = Path(__file__).resolve().parent
 PLUGIN_ID = 'mark.notch'
+PLUGIN_FILES = (
+    'manifest.json', 'Notch.qml', 'MediaPane.qml', 'ToastPane.qml',
+    'CalendarPane.qml', 'ActivityPane.qml', 'cava.conf',
+    'watch-navbar.sh', 'watch-notifications.sh', 'watch-recording.py',
+)
 
 
 def install(config_dir: Path, glass: bool = False):
-    source = PROJECT / 'plugin' / PLUGIN_ID
+    # The marketplace installs this repository as a root-layout plugin.
+    # Keep the optional manual install restricted to the runtime payload.
+    for name in PLUGIN_FILES:
+        if not (PROJECT / name).is_file():
+            raise ValueError(f'Missing plugin file: {name}')
     shell_path = config_dir / 'omarchy/shell.json'
     config = json.loads(shell_path.read_text()) if shell_path.exists() else {'version': 1}
     if not isinstance(config, dict):
@@ -38,7 +46,9 @@ def install(config_dir: Path, glass: bool = False):
     if target.exists():
         shutil.copytree(target, backup / PLUGIN_ID)
     # Overlay only project files, retaining any unrelated user additions.
-    shutil.copytree(source, target, dirs_exist_ok=True, ignore=shutil.ignore_patterns('__pycache__'))
+    target.mkdir(parents=True, exist_ok=True)
+    for name in PLUGIN_FILES:
+        shutil.copy2(PROJECT / name, target / name)
     shell_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = shell_path.with_name('shell.json.notch-tmp')
     temporary.write_text(json.dumps(config, indent=2) + '\n')

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location('recording', ROOT / 'plugin/mark.notch/watch-recording.py')
+spec = importlib.util.spec_from_file_location('recording', ROOT / 'watch-recording.py')
 recording = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(recording)
 

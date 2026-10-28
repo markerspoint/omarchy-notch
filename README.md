@@ -29,6 +29,13 @@ It uses Omarchy's `qs.Commons` module, shell APIs, and desktop commands.
 Developed against the installed Omarchy APIs in October 2026. Other shell versions
 may need adjustments. Dimensions and timing are near the top of `Notch.qml`.
 
+## Repository layout
+
+This repository contains one plugin. `manifest.json`, its QML entry point, and
+runtime helpers live at the repository root, as required by the Omarchy plugin
+marketplace. `install.py` is an optional manual installer; `hypr/` contains the
+optional glass rules and `tests/` contains development checks.
+
 ## Install
 
 ```sh
@@ -103,8 +110,8 @@ check `hyprctl configerrors`. Backups can be used to restore previous settings.
 
 ```sh
 python -m unittest discover -s tests -v
-bash -n plugin/mark.notch/watch-navbar.sh
-bash -n plugin/mark.notch/watch-notifications.sh
+bash -n watch-navbar.sh
+bash -n watch-notifications.sh
 ```
 
 The recording-state tests use a temporary `/proc` fixture and never start or stop
