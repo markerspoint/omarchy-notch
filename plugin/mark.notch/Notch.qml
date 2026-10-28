@@ -161,6 +161,7 @@ Item {
 
   property real shownPosition: 0
   property string lastTrackKey: ""
+  property bool lastMediaPlaying: false
 
   readonly property real progress: trackLength > 0
     ? Math.max(0, Math.min(1, shownPosition / trackLength)) : 0
@@ -177,16 +178,32 @@ Item {
   function nextTrack() { if (root.player && root.player.canGoNext) root.player.next() }
   function previousTrack() { if (root.player && root.player.canGoPrevious) root.player.previous() }
 
-  onPlayerChanged: { syncPosition(); lastTrackKey = trackTitle + "\n" + trackArtist }
-  onTrackTitleChanged: trackChanged()
-  onTrackArtistChanged: trackChanged()
+  // MPRIS can update player, title, artist, and playback separately. Coalesce
+  // them before choosing a tab so switching players cannot consume the event.
+  onPlayerChanged: mediaStateUpdate.restart()
+  onTrackTitleChanged: mediaStateUpdate.restart()
+  onTrackArtistChanged: mediaStateUpdate.restart()
+  onPlayingChanged: mediaStateUpdate.restart()
+
+  Timer {
+    id: mediaStateUpdate
+    interval: 50
+    onTriggered: root.trackChanged()
+  }
 
   function trackChanged() {
-    var key = trackTitle + "\n" + trackArtist
-    if (key === lastTrackKey) return
-    lastTrackKey = key
+    var key = root.player
+      ? String(root.player.dbusName || "") + "\n" + root.trackTitle + "\n" + root.trackArtist
+      : ""
+    var newPlayback = root.hasMedia && root.playing
+      && (key !== root.lastTrackKey || !root.lastMediaPlaying)
+    root.lastTrackKey = key
+    root.lastMediaPlaying = root.playing
     syncPosition()
-    if (flashOnTrackChange && hasMedia && playing && !root.expanded) flash()
+    if (!newPlayback) return
+    root.activitySelected = false
+    root.calendarSelected = false
+    if (flashOnTrackChange && !root.expanded) flash()
   }
 
   Timer {
@@ -945,7 +962,7 @@ Item {
           z: 1000
           acceptedButtons: Qt.NoButton
           hoverEnabled: true
-          onEntered: { hoverExitTimer.stop(); if (!root.expanded && root.hasActivities) root.activitySelected = true; root.hovered = true }
+          onEntered: { hoverExitTimer.stop(); if (!root.expanded && root.hasActivities && !root.playing) root.activitySelected = true; root.hovered = true }
           onExited: hoverExitTimer.restart()
         }
       }
@@ -966,7 +983,7 @@ Item {
       onClicked: function(mouse) {
         if (mouse.button === Qt.RightButton) clockCycleProc.running = true
         else if (mouse.button === Qt.MiddleButton) Quickshell.execDetached(["omarchy-menu-timezone"])
-        else { if (root.hasActivities) root.activitySelected = true; root.pin() }
+        else { if (root.hasActivities && !root.playing) root.activitySelected = true; root.pin() }
       }
     }
 

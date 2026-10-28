@@ -61,7 +61,10 @@ its format; middle-clicking opens the timezone menu.
 
 Open **Activities** for desktop controls. Recording or dictation starting will
 peek at that view, and ongoing activities stay visible in the collapsed notch.
-Audio analysis and video capture stop when their view is hidden.
+Starting or resuming playback, changing tracks, or switching the active player
+automatically selects **Now playing**, even if Activities or Calendar was last
+open. Manually choosing another tab stays in effect until the next playback
+event. Audio analysis and video capture stop when their view is hidden.
 
 For live YouTube video, first enable the browser's **Picture in picture** mode.
 The notch mirrors that dedicated window, retaining the browser's audio and
