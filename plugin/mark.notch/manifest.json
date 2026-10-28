@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "mark.notch",
+  "name": "Omarchy Notch",
+  "version": "0.1.0",
+  "author": "markerspoint",
+  "description": "A frosted, Mac-style notch for Omarchy with music, live audio spectrum, notifications, calendar, and desktop activities.",
+  "kinds": [
+    "overlay"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "Notch.qml"
+  }
+}
