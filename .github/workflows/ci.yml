@@ -53,7 +53,7 @@ jobs:
             /usr/lib/qt6/bin/qmlformat -n "$file" > /dev/null
           done
       - name: Compile liquid glass shader
-        run: /usr/lib/qt6/bin/qsb --qt6 -o "$RUNNER_TEMP/liquid-glass.frag.qsb" liquid-glass.frag
+        run: /usr/lib/qt6/bin/qsb --glsl "100 es,120,150" --hlsl 50 --msl 12 -o "$RUNNER_TEMP/liquid-glass.frag.qsb" liquid-glass.frag
       - name: Check shell scripts
         run: |
           bash -n watch-navbar.sh
