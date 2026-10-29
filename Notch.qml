@@ -491,6 +491,8 @@ Item {
   property real pointerX: -1000000
   property real pointerY: -1000000
   property bool barHoverSuppressed: false
+  // Keep an open card alive even while its animated input region catches up.
+  property bool pointerOverNotch: false
   readonly property bool centerBarHovered: !!targetMonitor && topOffset > 0
     && pointerX >= targetMonitor.x + (window.width - Math.min(window.width, centerHoverWidth)) / 2
     && pointerX < targetMonitor.x + (window.width + Math.min(window.width, centerHoverWidth)) / 2
@@ -510,8 +512,22 @@ Item {
       onRead: data => {
         try {
           var position = JSON.parse(data)
-          if (position.available === false) { root.pointerX = -1000000; root.pointerY = -1000000 }
-          else if (isFinite(position.x) && isFinite(position.y)) { root.pointerX = position.x; root.pointerY = position.y }
+          if (position.available === false) {
+            root.pointerOverNotch = false
+            root.pointerX = -1000000
+            root.pointerY = -1000000
+          } else if (isFinite(position.x) && isFinite(position.y)) {
+            // Set the keep-open latch first. Updating the bar coordinates can
+            // otherwise collapse the card before its hover region is reached.
+            var monitor = root.targetMonitor
+            var left = monitor ? monitor.x + (window.width - root.cardWidth) / 2 : 0
+            var top = monitor ? monitor.y + root.cardY : 0
+            root.pointerOverNotch = !!monitor && root.expanded
+              && position.x >= left && position.x < left + root.cardWidth
+              && position.y >= top && position.y < top + root.cardHeight
+            root.pointerX = position.x
+            root.pointerY = position.y
+          }
         } catch (e) {}
       }
     }
@@ -524,7 +540,7 @@ Item {
   property bool activitySelected: false
   property bool flashing: false
 
-  readonly property bool expanded: pinned || hovered || barHoverActive || toastActive || flashing
+  readonly property bool expanded: pinned || hovered || barHoverActive || pointerOverNotch || toastActive || flashing
   readonly property bool compact: expanded && !pinned
   readonly property bool idleHidden: !alwaysVisible && !expanded && !hasMedia
 
@@ -550,6 +566,7 @@ Item {
     hoverExitTimer.stop()
     pinned = false
     hovered = false
+    pointerOverNotch = false
     flashing = false
     toastActive = false
     toast = null
@@ -1138,6 +1155,7 @@ Item {
         notifications: root.liveNotifications.length,
         clockHover: clockArea.containsMouse,
         centerBarHovered: root.centerBarHovered,
+        pointerOverNotch: root.pointerOverNotch,
         barHoverActive: root.barHoverActive,
         pointerX: root.pointerX,
         pointerY: root.pointerY,
