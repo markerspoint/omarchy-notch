@@ -33,7 +33,7 @@ jobs:
       - name: Test installer, recorder state, and release archive
         run: python -m unittest discover -s tests -v
       - name: Check Python syntax
-        run: python -m py_compile install.py watch-recording.py scripts/package.py
+        run: python -m py_compile install.py watch-recording.py watch-pointer.py scripts/package.py
 
   syntax:
     name: QML, shell, and Lua

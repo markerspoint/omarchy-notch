@@ -78,7 +78,7 @@ Without transparency, the notch follows the bar's configured surface color.
 In fullscreen, the notch attaches directly to the screen’s top edge; outside
 fullscreen it joins the bar below the clock.
 
-Hover over the clock or just below it to peek. Click the clock or notch to pin it, and click
+Hover over the center of the top bar, including the clock and nearby indicators, or just below it to peek. The notch stays open while the pointer remains there, and the bar buttons remain clickable. Click the clock or notch to pin it, and click
 outside or on the clock again to close. Right-clicking the clock still cycles
 its format; middle-clicking opens the timezone menu.
 
@@ -112,6 +112,7 @@ omarchy-shell mark.notch debug
 - Notification cards support up to two title lines and six body lines, with a maximum width of 520 pixels.
 - PiP recognition currently expects an English “Picture-in-Picture” window title.
 - Recorder detection follows Omarchy's `gpu-screen-recorder` process.
+- Center-bar hover reads pointer coordinates through Hyprland's local IPC socket; it does not intercept clicks on neighboring bar widgets.
 - The screenshots above show the notch running on a live desktop. The project contains no private wallpaper files or personal system configuration.
 
 ## Remove

@@ -32,6 +32,7 @@ Item {
   property real glassLightY: 0.15
   Behavior on glassLightX { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
   Behavior on glassLightY { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
+  readonly property int centerHoverWidth: 300
   readonly property int collapsedWidth: 164
   readonly property int collapsedHeight: 10
   readonly property int compactWidth: 420
@@ -485,6 +486,37 @@ Item {
     }
   }
 
+  // Track the center bar without placing an input-blocking layer over its
+  // recording, weather, and other native buttons.
+  property real pointerX: -1000000
+  property real pointerY: -1000000
+  property bool barHoverSuppressed: false
+  readonly property bool centerBarHovered: !!targetMonitor && topOffset > 0
+    && pointerX >= targetMonitor.x + (window.width - Math.min(window.width, centerHoverWidth)) / 2
+    && pointerX < targetMonitor.x + (window.width + Math.min(window.width, centerHoverWidth)) / 2
+    && pointerY >= targetMonitor.y && pointerY < targetMonitor.y + topOffset
+  readonly property bool barHoverActive: centerBarHovered && !barHoverSuppressed
+  onCenterBarHoveredChanged: {
+    if (!centerBarHovered) barHoverSuppressed = false
+    else {
+      hoverExitTimer.stop()
+      if (!pinned && !hovered && !flashing && hasActivities && !playing) activitySelected = true
+    }
+  }
+  Process {
+    command: ["python", Qt.resolvedUrl("watch-pointer.py").toString().replace(/^file:\/\//, "")]
+    running: true
+    stdout: SplitParser {
+      onRead: data => {
+        try {
+          var position = JSON.parse(data)
+          if (position.available === false) { root.pointerX = -1000000; root.pointerY = -1000000 }
+          else if (isFinite(position.x) && isFinite(position.y)) { root.pointerX = position.x; root.pointerY = position.y }
+        } catch (e) {}
+      }
+    }
+  }
+
   // ------------------------------------------------------------ open state
   property bool hovered: false
   property bool pinned: false
@@ -492,7 +524,7 @@ Item {
   property bool activitySelected: false
   property bool flashing: false
 
-  readonly property bool expanded: pinned || hovered || toastActive || flashing
+  readonly property bool expanded: pinned || hovered || barHoverActive || toastActive || flashing
   readonly property bool compact: expanded && !pinned
   readonly property bool idleHidden: !alwaysVisible && !expanded && !hasMedia
 
@@ -1046,7 +1078,7 @@ Item {
       height: root.topOffset
       enabled: root.pinned && root.topOffset > 0
       cursorShape: Qt.PointingHandCursor
-      onClicked: { clockArea.suppressHover = true; root.closeAll() }
+      onClicked: { clockArea.suppressHover = true; root.barHoverSuppressed = true; root.closeAll() }
     }
   }
 
@@ -1105,6 +1137,10 @@ Item {
         topOffset: root.topOffset,
         notifications: root.liveNotifications.length,
         clockHover: clockArea.containsMouse,
+        centerBarHovered: root.centerBarHovered,
+        barHoverActive: root.barHoverActive,
+        pointerX: root.pointerX,
+        pointerY: root.pointerY,
         clockHitWidth: root.clockHitWidth,
         clockHitX: root.clockX,
         clickAwayY: maskRegion.y,
