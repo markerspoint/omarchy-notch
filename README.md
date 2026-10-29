@@ -46,19 +46,20 @@ may need adjustments. Dimensions and timing are near the top of `Notch.qml`.
 
 This repository contains one plugin. `manifest.json`, its QML entry point, and
 runtime helpers live at the repository root, as required by the Omarchy plugin
-marketplace. `install.py` is an optional manual installer; `hypr/` contains the
+marketplace. `install.py` is the installer; `hypr/` contains the
 optional glass rules and `tests/` contains development checks.
 
 ## Install
 
+Run this in a terminal on your Omarchy desktop:
+
 ```sh
-git clone https://github.com/markerspoint/omarchy-notch.git
-cd omarchy-notch
-python install.py --glass
-hyprctl reload
-hyprctl configerrors
-omarchy restart shell
+curl -fsSL https://raw.githubusercontent.com/markerspoint/omarchy-notch/main/install.sh | bash -s -- --glass
 ```
+
+This requires `curl`, Git, and Python 3. It downloads the latest `main` branch,
+installs the notch, reloads Hyprland, and restarts the Omarchy shell. To install
+without the optional glass rules, omit `--glass`.
 
 The installer copies the plugin to `~/.config/omarchy/plugins/mark.notch`,
 adds it to the existing `shell.json`, and preserves other plugins and settings.
@@ -68,7 +69,7 @@ Backups go under `~/.config/omarchy/backups/notch-<timestamp>/`.
 `~/.config/hypr/looknfeel.lua`. It enables blur and puts the bar and notch on the
 same wallpaper blur path to avoid a visible seam. If you manage Hyprland rules
 yourself, omit `--glass` and use [hypr/notch.lua](hypr/notch.lua) as a reference.
-The installer does not restart the desktop or install packages automatically.
+The installer does not install packages automatically.
 
 For the transparent look, enable `bar.transparent` in Omarchy's `shell.json`.
 Without transparency, the notch follows the bar's configured surface color.
