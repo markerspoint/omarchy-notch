@@ -68,7 +68,13 @@ Item {
     ? Math.max(0, Number(root.shell.bar.barSize) || 0) : 0
   readonly property string barPosition: root.shell && root.shell.bar
     ? String(root.shell.bar.position || "top") : "top"
-  readonly property bool barVisible: root.shell && root.shell.bar ? !root.shell.bar.barHidden : true
+  // Fullscreen hides top-layer bars without changing their barHidden flag.
+  // Follow the workspace on the notch's own monitor, not merely the active app.
+  readonly property var targetMonitor: root.targetScreen ? Hyprland.monitorFor(root.targetScreen) : null
+  readonly property bool fullscreenOnScreen: !!(targetMonitor && targetMonitor.activeWorkspace
+    && targetMonitor.activeWorkspace.hasFullscreen)
+  readonly property bool barVisible: !fullscreenOnScreen
+    && (root.shell && root.shell.bar ? !root.shell.bar.barHidden : true)
   // Join directly to the bottom of the bar while keeping its clock readable.
   readonly property int topOffset: (barPosition === "top" && barVisible)
     ? (barSize > 0 ? barSize : Style.bar.sizeHorizontal) : 0
@@ -613,7 +619,7 @@ Item {
       opacity: root.idleHidden ? 0 : 1
       visible: opacity > 0
 
-      Behavior on y { NumberAnimation { duration: 260; easing.type: Easing.OutQuint } }
+      // Snap to the visible screen/bar edge; animating this creates a floating seam.
       Behavior on width { NumberAnimation { duration: 340; easing.type: Easing.OutQuint } }
       Behavior on height { NumberAnimation { duration: 340; easing.type: Easing.OutQuint } }
       Behavior on opacity { NumberAnimation { duration: 160 } }
@@ -1086,6 +1092,8 @@ Item {
         toastActive: root.toastActive,
         hasMedia: root.hasMedia,
         barSize: root.barSize,
+        fullscreenOnScreen: root.fullscreenOnScreen,
+        barVisible: root.barVisible,
         topOffset: root.topOffset,
         notifications: root.liveNotifications.length,
         clockHover: clockArea.containsMouse,
