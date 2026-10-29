@@ -17,6 +17,16 @@ clock, expands on hover, and uses real frosted glass that follows your wallpaper
 - **Liquid glass:** wallpaper refraction, curved edge highlights, and a pointer-responsive sheen over compositor blur.
 - **Desktop integration:** the clock still opens the notch; nearby bar buttons remain clickable.
 
+## Screenshots
+
+![Now playing with live audio spectrum](docs/screenshots/now-playing.png)
+
+![Live notification card](docs/screenshots/notification.png)
+
+![Calendar view](docs/screenshots/calendar.png)
+
+![Activities view](docs/screenshots/activities.png)
+
 ## Requirements
 
 This is an **Omarchy shell plugin**, not a standalone Quickshell configuration.
@@ -99,7 +109,7 @@ omarchy-shell mark.notch debug
 - Notification cards support up to two title lines and six body lines, with a maximum width of 520 pixels.
 - PiP recognition currently expects an English “Picture-in-Picture” window title.
 - Recorder detection follows Omarchy's `gpu-screen-recorder` process.
-- This project contains no desktop screenshots, private wallpaper files, or personal system configuration.
+- The screenshots above show the notch running on a live desktop. The project contains no private wallpaper files or personal system configuration.
 
 ## Remove
 
