@@ -1015,6 +1015,7 @@ Item {
     // cycles the clock format and middle-click still opens the timezone menu.
     MouseArea {
       id: clockArea
+      property bool suppressHover: false
       x: root.clockX
       y: 0
       width: root.clockHitWidth
@@ -1023,6 +1024,13 @@ Item {
       acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
       hoverEnabled: true
       cursorShape: Qt.PointingHandCursor
+      onEntered: {
+        if (suppressHover) return
+        hoverExitTimer.stop()
+        if (!root.expanded && root.hasActivities && !root.playing) root.activitySelected = true
+        root.hovered = true
+      }
+      onExited: { suppressHover = false; hoverExitTimer.restart() }
       onClicked: function(mouse) {
         if (mouse.button === Qt.RightButton) clockCycleProc.running = true
         else if (mouse.button === Qt.MiddleButton) Quickshell.execDetached(["omarchy-menu-timezone"])
@@ -1038,7 +1046,7 @@ Item {
       height: root.topOffset
       enabled: root.pinned && root.topOffset > 0
       cursorShape: Qt.PointingHandCursor
-      onClicked: root.unpin()
+      onClicked: { clockArea.suppressHover = true; root.closeAll() }
     }
   }
 

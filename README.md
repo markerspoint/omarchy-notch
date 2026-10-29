@@ -78,7 +78,7 @@ Without transparency, the notch follows the bar's configured surface color.
 In fullscreen, the notch attaches directly to the screen’s top edge; outside
 fullscreen it joins the bar below the clock.
 
-Hover below the clock to peek. Click the clock or notch to pin it, and click
+Hover over the clock or just below it to peek. Click the clock or notch to pin it, and click
 outside or on the clock again to close. Right-clicking the clock still cycles
 its format; middle-clicking opens the timezone menu.
 
