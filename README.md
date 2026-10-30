@@ -35,8 +35,8 @@ It uses Omarchy's `qs.Commons` module, shell APIs, and desktop commands.
 - A recent Omarchy installation using the Quickshell shell and Lua Hyprland configuration.
 - A horizontal top bar with the clock centered.
 - Python 3, Bash, `jq`, and ImageMagick (`magick`).
-- Cava for the audio spectrum, using the PulseAudio compatibility server normally provided by PipeWire.
 - An MPRIS-compatible player for media controls.
+- Optional: Cava for the live audio spectrum, using PipeWire's PulseAudio compatibility server. Without Cava, the spectrum stays flat; playback controls, artwork, notifications, calendar, and activities still work. Install it with `omarchy pkg add cava`, then reopen the music pane.
 - Optional: Voxtype for dictation, a browser PiP window and Hyprland toplevel capture for live video.
 
 Developed against the installed Omarchy APIs in October 2026. Other shell versions
@@ -51,15 +51,37 @@ optional glass rules and `tests/` contains development checks.
 
 ## Install
 
-Run this in a terminal on your Omarchy desktop:
+Install and enable the plugin with Omarchy's standard command:
+
+```sh
+omarchy plugin add https://github.com/markerspoint/omarchy-notch.git --enable
+```
+
+The repository is a ready-to-load root plugin. No build or custom installer is
+required: the QML, runtime helpers, and compiled glass shader are included.
+Omarchy manages installation and enablement. Cava and custom glass rules are
+optional enhancements, not prerequisites for enabling the plugin. Update it with:
+
+```sh
+omarchy plugin update mark.notch
+```
+
+The command installs the current upstream code, which may differ from the
+marketplace's verified snapshot.
+
+### Optional glass setup and manual installation
+
+The notch works without custom Hyprland rules. For the optional compositor blur
+used in the screenshots, run the alternative installer:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/markerspoint/omarchy-notch/main/install.sh | bash -s -- --glass
 ```
 
-This requires `curl`, Git, and Python 3. It downloads the latest `main` branch,
-installs the notch, reloads Hyprland, and restarts the Omarchy shell. To install
-without the optional glass rules, omit `--glass`.
+This alternative requires `curl`, Git, and Python 3. It downloads the latest
+`main` branch, copies the plugin, reloads Hyprland, and restarts the Omarchy
+shell. It is also available without the optional glass rules: omit `--glass`.
+Use the standard command above if you want Omarchy to manage plugin updates.
 
 The installer copies the plugin to `~/.config/omarchy/plugins/mark.notch`,
 adds it to the existing `shell.json`, and preserves other plugins and settings.
@@ -118,8 +140,15 @@ omarchy-shell mark.notch debug
 
 ## Remove
 
-Remove `mark.notch` from the `plugins` array in `~/.config/omarchy/shell.json`,
-then remove `~/.config/omarchy/plugins/mark.notch/` and restart the shell.
+For a standard installation:
+
+```sh
+omarchy plugin remove mark.notch
+```
+
+For a manual installation, remove `mark.notch` from the `plugins` array in
+`~/.config/omarchy/shell.json`, then remove
+`~/.config/omarchy/plugins/mark.notch/` and restart the shell.
 If installed with `--glass`, remove the marked `require("hypr.notch")` block
 from `looknfeel.lua` and remove `~/.config/hypr/notch.lua`. Reload Hyprland and
 check `hyprctl configerrors`. Backups can be used to restore previous settings.

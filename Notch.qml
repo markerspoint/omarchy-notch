@@ -248,8 +248,10 @@ Item {
 
   Process {
     id: audioAnalyzer
-    command: ["cava", "-p", Qt.resolvedUrl("cava.conf").toString().replace(/^file:\/\//, "")]
+    command: ["bash", Qt.resolvedUrl("watch-audio.sh").toString().replace(/^file:\/\//, ""),
+      Qt.resolvedUrl("cava.conf").toString().replace(/^file:\/\//, "")]
     running: root.visualizerActive
+    onExited: root.audioLevels = []
     stdout: SplitParser {
       onRead: data => {
         var values = data.trim().split(";")

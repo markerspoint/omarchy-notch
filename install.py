@@ -10,7 +10,7 @@ PROJECT = Path(__file__).resolve().parent
 PLUGIN_ID = 'mark.notch'
 PLUGIN_FILES = (
     'manifest.json', 'Notch.qml', 'MediaPane.qml', 'ToastPane.qml',
-    'CalendarPane.qml', 'ActivityPane.qml', 'cava.conf',
+    'CalendarPane.qml', 'ActivityPane.qml', 'cava.conf', 'watch-audio.sh',
     'watch-navbar.sh', 'watch-notifications.sh', 'watch-recording.py', 'watch-pointer.py',
     'LiquidGlass.qml', 'liquid-glass.frag', 'liquid-glass.frag.qsb',
 )

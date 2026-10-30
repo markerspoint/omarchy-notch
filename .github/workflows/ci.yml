@@ -57,9 +57,10 @@ jobs:
       - name: Check shell scripts
         run: |
           bash -n watch-navbar.sh
+          bash -n watch-audio.sh
           bash -n watch-notifications.sh
           bash -n install.sh
-          shellcheck install.sh watch-navbar.sh watch-notifications.sh
+          shellcheck install.sh watch-navbar.sh watch-audio.sh watch-notifications.sh
       - name: Parse Hyprland Lua
         run: luac5.4 -p hypr/notch.lua
       - name: Check whitespace
